@@ -1,7 +1,7 @@
 name: Morning News Digest
 on:
-  schedule:
-    - cron: '0 12 * * *'  # 12:00 UTC = 7:00 AM EST
+#  schedule:
+#    - cron: '0 12 * * *'  # 12:00 UTC = 7:00 AM EST
   workflow_dispatch:       # ← allows manual triggering
 
 jobs:
