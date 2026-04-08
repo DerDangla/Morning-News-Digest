@@ -64,7 +64,7 @@ RSS_FEEDS = {
     },
 }
 
-ARTICLES_PER_FEED = 4
+ARTICLES_PER_FEED = 6
 
 
 # ─────────────────────────────────────────────
@@ -106,7 +106,6 @@ def summarize_with_groq(sections: dict) -> dict:
 
 Return ONLY valid JSON (no markdown, no backticks, no explanation) in this exact format:
 {{
-  "intro": "A warm, engaging 2-sentence morning greeting that references today's top themes across tech, world, and gaming.",
   "sections": [
     {{
       "category": "Tech",
@@ -145,7 +144,7 @@ Return ONLY valid JSON (no markdown, no backticks, no explanation) in this exact
 }}
 
 Rules:
-- Include exactly 3 stories per category (pick the most interesting ones)
+- Include exactly 5 stories per category (pick the most interesting ones)
 - Summaries must be informative and written in plain, friendly English
 - Only use stories from the data provided — do not invent anything
 - Tags should be short single words
@@ -170,7 +169,6 @@ Rules:
 # ─────────────────────────────────────────────
 def build_html(digest: dict) -> str:
     today   = datetime.now().strftime("%A, %B %d, %Y")
-    intro   = digest.get("intro", "Good morning! Here's your daily news digest.")
     sections = digest.get("sections", [])
 
     category_meta = {
@@ -238,11 +236,9 @@ def build_html(digest: dict) -> str:
           <!-- HEADER -->
           <tr>
             <td style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 60%, #4338ca 100%); border-radius:14px 14px 0 0; padding:40px 40px 36px;">
-              <p style="margin:0 0 6px 0; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#a5b4fc;">Daily Briefing</p>
+              <p style="margin:0 0 4px 0; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:#a5b4fc;">Daily Briefing</p>
               <h1 style="margin:0 0 4px 0; font-size:36px; font-weight:900; color:#ffffff; font-family:Georgia,serif; letter-spacing:-0.5px;">Morning Digest</h1>
-              <p style="margin:0 0 20px 0; font-size:13px; color:#a5b4fc; letter-spacing:0.5px;">{today}</p>
-              <div style="height:1px; background:rgba(165,180,252,0.25); margin-bottom:20px;"></div>
-              <p style="margin:0; font-size:15px; color:#c7d2fe; line-height:1.7; font-style:italic;">{intro}</p>
+              <p style="margin:0; font-size:13px; color:#a5b4fc; letter-spacing:0.5px;">{today}</p>
             </td>
           </tr>
 
