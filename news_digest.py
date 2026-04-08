@@ -1,36 +1,36 @@
 #!/usr/bin/env python3
 """
-Automated Morning News Digest
-------------------------------
+Automated Morning News Digest (Groq Edition)
+---------------------------------------------
 Fetches Tech, World, and Gaming news via RSS feeds,
-summarizes them using Claude AI, and emails the digest to you.
+summarizes them using Groq AI (free), and emails the digest to you.
 
 Setup:
-  pip install feedparser anthropic
+  pip install feedparser groq
 
 Required environment variables (or fill in the CONFIG section below):
-  ANTHROPIC_API_KEY   - your Anthropic API key
+  GROQ_API_KEY        - your Groq API key (free at console.groq.com)
   SMTP_EMAIL          - your Gmail address
   SMTP_APP_PASSWORD   - your Gmail App Password (16-char)
   RECIPIENT_EMAIL     - email to send the digest to
 """
 
 import feedparser
-import anthropic
-import smtplib
 import os
+import re
+import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from datetime import datetime
+from groq import Groq
 
 # ─────────────────────────────────────────────
 #  CONFIG — fill these in or set as env vars
 # ─────────────────────────────────────────────
-ANTHROPIC_API_KEY  = os.getenv("ANTHROPIC_API_KEY",  "YOUR_ANTHROPIC_API_KEY")
-SMTP_EMAIL         = os.getenv("SMTP_EMAIL",          "your_gmail@gmail.com")
-SMTP_APP_PASSWORD  = os.getenv("SMTP_APP_PASSWORD",   "your_app_password_here")
-RECIPIENT_EMAIL    = os.getenv("RECIPIENT_EMAIL",      "your_gmail@gmail.com")
-SEND_TIME_HOUR     = 7   # 24-hour format (7 = 7:00 AM)
+GROQ_API_KEY      = os.getenv("GROQ_API_KEY",       "YOUR_GROQ_API_KEY")
+SMTP_EMAIL        = os.getenv("SMTP_EMAIL",          "your_gmail@gmail.com")
+SMTP_APP_PASSWORD = os.getenv("SMTP_APP_PASSWORD",   "your_app_password_here")
+RECIPIENT_EMAIL   = os.getenv("RECIPIENT_EMAIL",     "your_gmail@gmail.com")
 
 # ─────────────────────────────────────────────
 #  RSS FEEDS
@@ -50,7 +50,7 @@ RSS_FEEDS = {
     ],
 }
 
-ARTICLES_PER_FEED = 3   # how many articles to pull from each feed
+ARTICLES_PER_FEED = 3  # how many articles to pull per feed
 
 
 # ─────────────────────────────────────────────
@@ -68,8 +68,6 @@ def fetch_articles():
                     title   = entry.get("title", "No title")
                     link    = entry.get("link", "")
                     summary = entry.get("summary", entry.get("description", ""))
-                    # Strip basic HTML tags from summary
-                    import re
                     summary = re.sub(r"<[^>]+>", "", summary).strip()
                     summary = summary[:300] + "..." if len(summary) > 300 else summary
                     articles.append({"title": title, "link": link, "summary": summary})
@@ -82,19 +80,19 @@ def fetch_articles():
 
 
 # ─────────────────────────────────────────────
-#  STEP 2: Summarize with Claude
+#  STEP 2: Summarize with Groq (free)
 # ─────────────────────────────────────────────
-def summarize_with_claude(sections: dict) -> str:
-    client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+def summarize_with_groq(sections: dict) -> str:
+    client = Groq(api_key=GROQ_API_KEY)
 
-    # Build the raw news text to send to Claude
+    # Build raw news text
     raw_text = ""
     for category, articles in sections.items():
         raw_text += f"\n\n=== {category} ===\n"
         for a in articles:
             raw_text += f"\nTitle: {a['title']}\nSummary: {a['summary']}\nURL: {a['link']}\n"
 
-    prompt = f"""You are a friendly morning news assistant. 
+    prompt = f"""You are a friendly morning news assistant.
 Below are raw RSS news articles across three categories: Tech, World, and Gaming.
 
 Your job:
@@ -110,33 +108,32 @@ Your job:
 {raw_text}
 """
 
-    message = client.messages.create(
-        model="claude-sonnet-4-20250514",
-        max_tokens=1024,
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",  # fast, free, high quality
         messages=[{"role": "user", "content": prompt}],
+        max_tokens=1024,
     )
 
-    return message.content[0].text
+    return response.choices[0].message.content
 
 
 # ─────────────────────────────────────────────
 #  STEP 3: Send the email
 # ─────────────────────────────────────────────
 def send_email(body: str):
-    today = datetime.now().strftime("%A, %B %d, %Y")
+    today   = datetime.now().strftime("%A, %B %d, %Y")
     subject = f"☀️ Your Morning News Digest — {today}"
 
-    # Build HTML version for nicer rendering
     html_body = f"""
-    <html><body style="font-family: Arial, sans-serif; max-width: 650px; margin: auto; color: #222;">
+    <html><body style="font-family: Arial, sans-serif; max-width: 650px; margin: auto; color: #222; line-height: 1.7;">
       <h2 style="color:#2d6cdf;">☀️ Morning News Digest</h2>
       <p style="color:#888; font-size:13px;">{today}</p>
       <hr style="border:none; border-top:1px solid #eee;">
-      <div style="white-space: pre-wrap; line-height:1.7; font-size:15px;">{body}</div>
+      <div style="white-space: pre-wrap; font-size:15px;">{body}</div>
       <hr style="border:none; border-top:1px solid #eee; margin-top:30px;">
       <p style="font-size:11px; color:#aaa;">
-        Automated digest powered by Claude AI &amp; Python.<br>
-        To unsubscribe, simply stop running the script or the scheduled task.
+        Automated digest powered by Groq AI &amp; Python.<br>
+        To unsubscribe, simply disable the scheduled GitHub Action.
       </p>
     </body></html>
     """
@@ -168,8 +165,8 @@ def run_digest():
     total = sum(len(v) for v in sections.values())
     print(f"  📦 Fetched {total} articles across {len(sections)} categories")
 
-    print("  🤖 Summarizing with Claude...")
-    summary = summarize_with_claude(sections)
+    print("  🤖 Summarizing with Groq...")
+    summary = summarize_with_groq(sections)
 
     print("  📧 Sending email...")
     send_email(summary)
