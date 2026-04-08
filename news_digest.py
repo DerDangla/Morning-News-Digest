@@ -144,7 +144,7 @@ Return ONLY valid JSON (no markdown, no backticks, no explanation) in this exact
 }}
 
 Rules:
-- Include exactly 5 stories per category (pick the most interesting ones)
+- Include 3 to 5 stories per category (pick the most interesting ones)
 - Summaries must be informative and written in plain, friendly English
 - Only use stories from the data provided — do not invent anything
 - Tags should be short single words
