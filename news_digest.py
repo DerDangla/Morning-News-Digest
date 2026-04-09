@@ -62,6 +62,16 @@ RSS_FEEDS = {
             "https://kotaku.com/rss",
         ],
     },
+    "DevSecOps": {
+        "icon": "🛡️",
+        "color": "#ef4444",
+        "urls": [
+            "https://aws.amazon.com/blogs/aws/feed/",
+            "https://aws.amazon.com/blogs/security/feed/",
+            "https://feeds.feedburner.com/TheHackersNews",
+            "https://www.darkreading.com/rss.xml",
+        ],
+    },
 }
 
 ARTICLES_PER_FEED = 6
@@ -139,6 +149,17 @@ Return ONLY valid JSON (no markdown, no backticks, no explanation) in this exact
           "tag": "..."
         }}
       ]
+    }},
+    {{
+      "category": "DevSecOps",
+      "stories": [
+        {{
+          "headline": "...",
+          "summary": "...",
+          "url": "...",
+          "tag": "One-word tag e.g. AWS, Terraform, Security, Cloud, IaC, CVE"
+        }}
+      ]
     }}
   ]
 }}
@@ -156,7 +177,7 @@ Rules:
     response = client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[{"role": "user", "content": prompt}],
-        max_tokens=2000,
+        max_tokens=2800,
     )
 
     raw = response.choices[0].message.content.strip()
@@ -172,9 +193,10 @@ def build_html(digest: dict) -> str:
     sections = digest.get("sections", [])
 
     category_meta = {
-        "Tech":   {"icon": "💻", "color": "#6366f1", "light": "#eef2ff"},
-        "World":  {"icon": "🌍", "color": "#10b981", "light": "#ecfdf5"},
-        "Gaming": {"icon": "🎮", "color": "#f59e0b", "light": "#fffbeb"},
+        "Tech":      {"icon": "💻", "color": "#6366f1", "light": "#eef2ff"},
+        "World":     {"icon": "🌍", "color": "#10b981", "light": "#ecfdf5"},
+        "Gaming":    {"icon": "🎮", "color": "#f59e0b", "light": "#fffbeb"},
+        "DevSecOps": {"icon": "🛡️", "color": "#ef4444", "light": "#fef2f2"},
     }
 
     sections_html = ""
@@ -247,7 +269,8 @@ def build_html(digest: dict) -> str:
             <td style="background:#ffffff; padding:16px 40px; border-bottom: 1px solid #e5e7eb;">
               <span style="display:inline-block; background:#eef2ff; color:#6366f1; font-size:11px; font-weight:700; padding:5px 14px; border-radius:20px; margin-right:8px; letter-spacing:0.5px;">💻 Tech</span>
               <span style="display:inline-block; background:#ecfdf5; color:#10b981; font-size:11px; font-weight:700; padding:5px 14px; border-radius:20px; margin-right:8px; letter-spacing:0.5px;">🌍 World</span>
-              <span style="display:inline-block; background:#fffbeb; color:#f59e0b; font-size:11px; font-weight:700; padding:5px 14px; border-radius:20px; letter-spacing:0.5px;">🎮 Gaming</span>
+              <span style="display:inline-block; background:#fffbeb; color:#f59e0b; font-size:11px; font-weight:700; padding:5px 14px; border-radius:20px; margin-right:8px; letter-spacing:0.5px;">🎮 Gaming</span>
+              <span style="display:inline-block; background:#fef2f2; color:#ef4444; font-size:11px; font-weight:700; padding:5px 14px; border-radius:20px; letter-spacing:0.5px;">🛡️ DevSecOps</span>
             </td>
           </tr>
 
