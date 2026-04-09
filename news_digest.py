@@ -54,14 +54,6 @@ RSS_FEEDS = {
             "https://feeds.reuters.com/reuters/worldNews",
         ],
     },
-    "Gaming": {
-        "icon": "🎮",
-        "color": "#f59e0b",
-        "urls": [
-            "https://feeds.feedburner.com/ign/news",
-            "https://kotaku.com/rss",
-        ],
-    },
     "DevSecOps": {
         "icon": "🛡️",
         "color": "#ef4444",
@@ -70,6 +62,14 @@ RSS_FEEDS = {
             "https://aws.amazon.com/blogs/security/feed/",
             "https://feeds.feedburner.com/TheHackersNews",
             "https://www.darkreading.com/rss.xml",
+        ],
+    },
+    "Gaming": {
+        "icon": "🎮",
+        "color": "#f59e0b",
+        "urls": [
+            "https://feeds.feedburner.com/ign/news",
+            "https://kotaku.com/rss",
         ],
     },
 }
@@ -140,17 +140,6 @@ Return ONLY valid JSON (no markdown, no backticks, no explanation) in this exact
       ]
     }},
     {{
-      "category": "Gaming",
-      "stories": [
-        {{
-          "headline": "...",
-          "summary": "...",
-          "url": "...",
-          "tag": "..."
-        }}
-      ]
-    }},
-    {{
       "category": "DevSecOps",
       "stories": [
         {{
@@ -160,12 +149,23 @@ Return ONLY valid JSON (no markdown, no backticks, no explanation) in this exact
           "tag": "One-word tag e.g. AWS, Terraform, Security, Cloud, IaC, CVE"
         }}
       ]
+    }},
+    {{
+      "category": "Gaming",
+      "stories": [
+        {{
+          "headline": "...",
+          "summary": "...",
+          "url": "...",
+          "tag": "..."
+        }}
+      ]
     }}
   ]
 }}
 
 Rules:
-- Include 3 to 5 stories per category (pick the most interesting ones)
+- Include 3 to 5 stories per category (pick the most interesting ones), except Gaming which should have exactly 3
 - Summaries must be informative and written in plain, friendly English
 - Only use stories from the data provided — do not invent anything
 - Tags should be short single words
@@ -269,8 +269,8 @@ def build_html(digest: dict) -> str:
             <td style="background:#ffffff; padding:16px 40px; border-bottom: 1px solid #e5e7eb;">
               <span style="display:inline-block; background:#eef2ff; color:#6366f1; font-size:11px; font-weight:700; padding:5px 14px; border-radius:20px; margin-right:8px; letter-spacing:0.5px;">💻 Tech</span>
               <span style="display:inline-block; background:#ecfdf5; color:#10b981; font-size:11px; font-weight:700; padding:5px 14px; border-radius:20px; margin-right:8px; letter-spacing:0.5px;">🌍 World</span>
-              <span style="display:inline-block; background:#fffbeb; color:#f59e0b; font-size:11px; font-weight:700; padding:5px 14px; border-radius:20px; margin-right:8px; letter-spacing:0.5px;">🎮 Gaming</span>
-              <span style="display:inline-block; background:#fef2f2; color:#ef4444; font-size:11px; font-weight:700; padding:5px 14px; border-radius:20px; letter-spacing:0.5px;">🛡️ DevSecOps</span>
+              <span style="display:inline-block; background:#fef2f2; color:#ef4444; font-size:11px; font-weight:700; padding:5px 14px; border-radius:20px; margin-right:8px; letter-spacing:0.5px;">🛡️ DevSecOps</span>
+              <span style="display:inline-block; background:#fffbeb; color:#f59e0b; font-size:11px; font-weight:700; padding:5px 14px; border-radius:20px; letter-spacing:0.5px;">🎮 Gaming</span>
             </td>
           </tr>
 
